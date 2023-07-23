@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+  server:
+    container_name: user-service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: sing3demons/user-service
+    ports:
+      - '3000:3000'
+    environment:
+      - DATABASE_URL=mongodb://host.docker.internal:30001/expressAPI?directConnection=true&serverSelectionTimeoutMS=3000
+      - KAFKA_BROKERS=kafka:9092
+    networks:
+      - ms-service
+networks:
+  ms-service:
+   name: ms-service

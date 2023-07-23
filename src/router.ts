@@ -1,0 +1,18 @@
+import { Router } from 'express'
+import UsersController from './controller/users.controller'
+
+
+const usersRouter = Router()
+const usersController = new UsersController()
+
+usersRouter.get('/users', usersController.getUsers)
+
+usersRouter.get('/users/:id', usersController.getUserById)
+
+usersRouter.post('/users', usersController.createUser)
+
+usersRouter.put('/users/:id', usersController.updateUser)
+
+usersRouter.delete('/users/:id', usersController.deleteUser)
+
+export default usersRouter
