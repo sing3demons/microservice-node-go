@@ -1,11 +1,28 @@
 import { Request, Response } from 'express'
 import UsersService from '../services/users.service'
 
-import { RequestQuery, User, UserRequest, UsersResponse } from '../dto/users'
+import {
+  RequestQuery,
+  TokenData,
+  TokenDt,
+  User,
+  UserRequest,
+  UsersResponse
+} from '../dto/users'
 import JSONResponse from '../utils/response'
 
 class UsersController {
   public usersService = new UsersService()
+
+  public register = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const body = UserRequest.parse(req.body) as User
+      const newUser: User = await this.usersService.register(body)
+      JSONResponse.success(req, res, 'success', newUser)
+    } catch (e) {
+      JSONResponse.serverError(req, res)
+    }
+  }
 
   public getUsers = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -13,29 +30,23 @@ class UsersController {
 
       const users: UsersResponse = await this.usersService.getUsers(query)
       JSONResponse.success(req, res, 'success', users)
-    } catch (e: any) {
-      JSONResponse.serverError(req, res, e.message)
+    } catch (e) {
+      JSONResponse.serverError(req, res)
     }
   }
 
   public getUserById = async (req: Request, res: Response): Promise<void> => {
     try {
+      //   const { userId }: TokenDt = req
       const { id } = req.params
       const user: User | null = await this.usersService.getUserById(id)
-      res.status(200).json({ user })
-    } catch (e: any) {
-      res.status(500).json({ error: e.message })
-    }
-  }
-
-  public createUser = async (req: Request, res: Response): Promise<void> => {
-    try {
-      const body = UserRequest.parse(req.body) as User
-
-      const newUser: User = await this.usersService.createUser(body)
-      res.status(201).json({ user: newUser })
-    } catch (e: any) {
-      res.status(500).json({ error: e.message })
+      if (!user) {
+        JSONResponse.notFound(req, res, 'user not found')
+        return
+      }
+      JSONResponse.success(req, res, 'success', user)
+    } catch (e) {
+      JSONResponse.serverError(req, res)
     }
   }
 
@@ -43,23 +54,45 @@ class UsersController {
     try {
       const { id } = req.params
       const userUpdate: User = req.body
-      const updatedUser: User = await this.usersService.updateUser(
-        id,
-        userUpdate
-      )
-      res.status(200).json({ user: updatedUser })
-    } catch (e: any) {
-      res.status(500).json({ error: e.message })
+      const user: User = await this.usersService.updateUser(id, userUpdate)
+      JSONResponse.success(req, res, 'success', user)
+    } catch (e) {
+      JSONResponse.serverError(req, res)
     }
+  }
+
+  private readonly requestToken = (req: Request): TokenDt => {
+    const reqToken = req as TokenData
+    return reqToken.TokenDt
   }
 
   public deleteUser = async (req: Request, res: Response): Promise<void> => {
     try {
+      const { userId }: TokenDt = this.requestToken(req)
+
+      if (!userId) {
+        JSONResponse.unauthorized(req, res, 'unauthorized')
+        return
+      }
       const { id } = req.params
-      const deletedUser: User = await this.usersService.deleteUser(id)
-      res.status(200).json({ user: deletedUser })
-    } catch (e: any) {
-      res.status(500).json({ error: e.message })
+      if (userId !== id) {
+        JSONResponse.forbidden(req, res, 'forbidden')
+        return
+      }
+      const user: User = await this.usersService.deleteUser(id)
+      JSONResponse.success(req, res, 'success', user)
+    } catch (e) {
+      JSONResponse.serverError(req, res)
+    }
+  }
+
+  public login = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { email, password } = req.body
+      const token = await this.usersService.login(email, password)
+      JSONResponse.success(req, res, 'success', token)
+    } catch (e) {
+      JSONResponse.serverError(req, res)
     }
   }
 }

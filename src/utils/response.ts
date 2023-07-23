@@ -1,9 +1,29 @@
 import { Request, Response } from 'express'
 import logger from './logger'
+import { Sensitive } from '../dto/users'
 
 class JSONResponse {
   static success(req: Request, res: Response, message: string, data?: object) {
     req.body.password && delete req.body.password
+
+    if (data) {
+      if (Object.prototype.hasOwnProperty.call(data, 'users')) {
+        const users = (data as Sensitive)['users']
+        users.forEach((item: Sensitive) => {
+         if (Object.prototype.hasOwnProperty.call(data, 'password')) {
+           if ((item as Sensitive)['password']) {
+             delete (item as Sensitive)['password']
+           }
+         }
+        })
+      } else if (typeof data === 'object' && data !== null) {
+        if (Object.prototype.hasOwnProperty.call(data, 'password')) {
+          if ((data as Sensitive)['password']) {
+            delete (data as Sensitive)['password']
+          }
+        }
+      }
+    }
     logger.info(
       JSON.stringify({
         ip: req.ip,
@@ -98,10 +118,25 @@ class JSONResponse {
     })
   }
 
+  static forbidden(req: Request, res: Response, message: string) {
+    logger.info(
+      JSON.stringify({
+        ip: req.ip,
+        method: req.method,
+        url: req.url,
+        query: req.query
+      })
+    )
+    res.status(403).json({
+      code: 403,
+      message: message || 'forbidden'
+    })
+  }
+
   static serverError(
     req: Request,
     res: Response,
-    message: string,
+    message?: string,
     data?: object
   ) {
     logger.info(

@@ -1,5 +1,7 @@
 import { RequestQuery, User, UsersResponse } from '../dto/users'
 import UsersRepository from '../repositories/users.repository'
+import { compare, genSalt, hash } from 'bcrypt'
+import { generateJWT } from '../utils/jwt'
 
 class UsersService {
   private users = new UsersRepository()
@@ -8,45 +10,132 @@ class UsersService {
     try {
       const { size, skip } = query
 
-      return await this.users.findAll({
+      const data = await this.users.findAll({
         skip: Number(skip) | 0,
         size: Number(size) | 10
       })
-    } catch (e: any) {
-      throw new Error(e)
+
+      if (!data) {
+        throw new Error('Error retrieving users')
+      }
+
+      return data
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new Error(e.message)
+      }
+      throw e
     }
   }
 
   public getUserById = async (id: string): Promise<User | null> => {
     try {
-      return await this.users.findById(id)
-    } catch (e: any) {
-      throw new Error(e)
+      const user = await this.users.findById(id)
+      if (!user) {
+        return null
+      }
+      return user as User
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new Error(e.message)
+      }
+      throw e
     }
   }
 
-  public createUser = async (data: User): Promise<User> => {
+  public createUser = async (data: User): Promise<User | undefined> => {
     try {
       const user = await this.users.createUser(data)
       return user
-    } catch (e: any) {
-      throw new Error(e)
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new Error(e.message)
+      }
     }
   }
 
   public updateUser = async (id: string, data: User): Promise<User> => {
     try {
-      return await this.users.updateUser(id, data)
-    } catch (e: any) {
-      throw new Error(e)
+      const u = await this.users.updateUser(id, data)
+      if (!u) {
+        throw new Error('Error updating user')
+      }
+      return u
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new Error(e.message)
+      }
+      throw e
     }
   }
 
   public deleteUser = async (id: string): Promise<User> => {
     try {
-      return await this.users.deleteUser(id)
-    } catch (e: any) {
-      throw new Error(e)
+      const user = await this.users.deleteUser(id)
+      if (!user) {
+        throw new Error('Error deleting user')
+      }
+      return user
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new Error(e.message)
+      }
+      throw e
+    }
+  }
+
+  private hashPassword = async (password: string): Promise<string> => {
+    const salt = await genSalt(10)
+    return await hash(password, salt)
+  }
+
+  private comparePassword = async (
+    password: string,
+    hashPassword: string
+  ): Promise<boolean> => {
+    const match = await compare(password, hashPassword)
+    if (!match) {
+      throw new Error('Invalid password')
+    }
+    return match
+  }
+
+  public register = async (u: User): Promise<User> => {
+    try {
+      const user = await this.users.findUserByEmail(u.email)
+      if (user) {
+        throw new Error('User already exists')
+      }
+
+      u.password = await this.hashPassword(u.password)
+      const newUser = await this.users.createUser(u)
+      if (!newUser) {
+        throw new Error('Error creating user')
+      }
+
+      return newUser
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new Error(e.message)
+      }
+    }
+    throw new Error('Unexpected error occurred while registering user')
+  }
+
+  public login = async (email: string, password: string) => {
+    try {
+      const user = await this.users.findUserByEmail(email)
+      if (!user) {
+        throw new Error('User not found')
+      }
+
+      await this.comparePassword(password, user.password)
+
+      return await generateJWT(user)
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new Error(e.message)
+      }
     }
   }
 }

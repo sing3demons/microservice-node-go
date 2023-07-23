@@ -3,7 +3,7 @@ import dotenv from 'dotenv'
 import usersRouter from './router'
 import prisma, { ConnectMongo } from './connect'
 import logger from './utils/logger'
-import consumer from './consumer/user.consumer'
+// import consumer from './consumer/user.consumer'
 import Graceful from '@ladjs/graceful'
 
 import producer from './producer/users.producer'
@@ -17,14 +17,14 @@ app.get('/', async (req, res) => {
   await producer('hello world')
   res.send('Hello World!')
 })
-app.use(usersRouter)
+app.use('/api', usersRouter)
 
 async function main() {
   await ConnectMongo()
   const server = app.listen(port, () =>
     logger.info(`Server is listening on port ${port}`)
   )
-  await consumer()
+  // await consumer()
   new Graceful({ servers: [server] }).listen()
 }
 

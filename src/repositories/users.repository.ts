@@ -30,10 +30,7 @@ class UsersRepository {
     }
   }
 
-  public findAll = async ({
-    skip,
-    size
-  }: RequestQuery): Promise<UsersResponse> => {
+  public findAll = async ({ skip, size }: RequestQuery) => {
     try {
       // const { users, total }: UsersResponse = await this.findAllAndCount({ skip, size })
       const [users, total] = await Promise.all([
@@ -46,53 +43,66 @@ class UsersRepository {
         users,
         total
       }
-    } catch (e: any) {
+    } catch (e) {
       console.error(e)
-      throw new Error(e)
+      if (e instanceof Error) {
+        throw new Error(e.message)
+      }
     }
   }
 
-  public findById = async (id: string): Promise<User | null> => {
+  public findById = async (id: string) => {
     try {
       return await this.users.findUnique({ where: { id } })
-    } catch (e: any) {
-      throw new Error(e)
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new Error(e.message)
+      }
     }
   }
 
-  public findUserByEmail = async (email: string): Promise<User | null> => {
+  public findUserByEmail = async (email: string) => {
     try {
       return await this.users.findUnique({ where: { email } })
-    } catch (e: any) {
-      throw new Error(e)
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new Error(e.message)
+      }
     }
   }
 
-  public createUser = async (data: User): Promise<User> => {
+  public createUser = async (data: User) => {
     try {
       return await this.users.create({ data })
-    } catch (e: any) {
-      throw new Error(e)
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new Error(e.message)
+      }
     }
   }
 
-  public updateUser = async (id: string, data: User): Promise<User> => {
+  public updateUser = async (
+    id: string,
+    data: User
+  ): Promise<User | undefined> => {
     try {
       return await this.users.update({ where: { id }, data })
-    } catch (e: any) {
-      throw new Error(e)
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new Error(e.message)
+      }
     }
   }
 
-  public deleteUser = async (id: string): Promise<User> => {
+  public deleteUser = async (id: string): Promise<User | undefined> => {
     try {
       return await this.users.delete({
-        where: {
-          id
-        }
+        where: { id }
       })
-    } catch (e: any) {
-      throw new Error(e)
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new Error(e.message)
+      }
     }
   }
 }
