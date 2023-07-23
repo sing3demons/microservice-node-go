@@ -12,7 +12,12 @@ npx prisma init --datasource-provider mongodb
 yarn add express dotenv
 yarn add @prisma/client
 yarn add winston dayjs
-yarn add kafkajs
+yarn add kafkajs @ladjs/graceful
+npx eslint --init
+```
+
+```install devDependencies
+yarn add -D @types/kafkajs
 ```
 
 ### start mongodb #1

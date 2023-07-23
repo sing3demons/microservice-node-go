@@ -15,12 +15,14 @@ async function consumer(): Promise<void> {
             key: message?.key?.toString(),
             headers: message?.headers,
             topic,
-            partition,
+            partition
           })
         )
 
+        if (topic === 'update_profile') {
+        }
         console.log(message?.value?.toString())
-      },
+      }
     })
   } catch (error: any) {
     throw new Error(error)

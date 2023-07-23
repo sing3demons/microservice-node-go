@@ -11,13 +11,13 @@ class JSONResponse {
         url: req.url,
         query: req.query,
         body: req.body,
-        data: data,
+        data: data
       })
     )
     res.status(200).json({
       code: 200,
       message: message || 'success',
-      data: data,
+      data: data
     })
   }
 
@@ -30,17 +30,22 @@ class JSONResponse {
         method: req.method,
         url: req.url,
         body: req.body,
-        data: data,
+        data: data
       })
     )
     res.status(201).json({
       code: 201,
       message: message || 'created',
-      data: data,
+      data: data
     })
   }
 
-  static badRequest(req: Request, res: Response, message: string, data?: object) {
+  static badRequest(
+    req: Request,
+    res: Response,
+    message: string,
+    data?: object
+  ) {
     if (req.body?.password) {
       delete req.body.password
     }
@@ -52,14 +57,14 @@ class JSONResponse {
         url: req.url,
         query: req.query,
         body: req.body,
-        data: data,
+        data: data
       })
     )
 
     res.status(400).json({
       code: 400,
       message: message || 'bad request',
-      data: data,
+      data: data
     })
   }
 
@@ -69,12 +74,12 @@ class JSONResponse {
         ip: req.ip,
         method: req.method,
         url: req.url,
-        query: req.query,
+        query: req.query
       })
     )
     res.status(404).json({
       code: 404,
-      message: message || 'not found',
+      message: message || 'not found'
     })
   }
 
@@ -84,29 +89,34 @@ class JSONResponse {
         ip: req.ip,
         method: req.method,
         url: req.url,
-        query: req.query,
+        query: req.query
       })
     )
     res.status(401).json({
       code: 401,
-      message: message || 'unauthorized',
+      message: message || 'unauthorized'
     })
   }
 
-  static serverError(req: Request, res: Response, message: string, data?: object) {
+  static serverError(
+    req: Request,
+    res: Response,
+    message: string,
+    data?: object
+  ) {
     logger.info(
       JSON.stringify({
         ip: req.ip,
         method: req.method,
         url: req.url,
         query: req.query,
-        data: data,
+        data: data
       })
     )
     res.status(500).json({
       code: 500,
       message: message || 'internal server error',
-      data: data,
+      data: data
     })
   }
 }

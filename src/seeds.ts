@@ -7,21 +7,25 @@ async function createUser(n: number): Promise<void> {
     await prisma.user.create({
       data: {
         username: 'Rich' + i,
-            email: `hello${i}@prisma.com`,
-            password: 'password',
-        
-      },
+        email: `hello${i}@prisma.com`,
+        password: 'password'
+      }
     })
   }
+  var users = await prisma.user.findMany()
+
   console.log(`Created ${n} users`)
 }
 
 async function findAll(): Promise<{ users: User[]; count: number }> {
-  const [users, count] = await prisma.$transaction([prisma.user.findMany(), prisma.user.count()])
+  const [users, count] = await prisma.$transaction([
+    prisma.user.findMany(),
+    prisma.user.count()
+  ])
   //   const [users, count] = await Promise.all([prisma.user.findMany(), prisma.user.count()])
   return {
     users,
-    count,
+    count
   }
 }
 

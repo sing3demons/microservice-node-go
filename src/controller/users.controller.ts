@@ -43,7 +43,10 @@ class UsersController {
     try {
       const { id } = req.params
       const userUpdate: User = req.body
-      const updatedUser: User = await this.usersService.updateUser(id, userUpdate)
+      const updatedUser: User = await this.usersService.updateUser(
+        id,
+        userUpdate
+      )
       res.status(200).json({ user: updatedUser })
     } catch (e: any) {
       res.status(500).json({ error: e.message })

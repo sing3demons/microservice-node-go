@@ -13,8 +13,8 @@ const kafka = new Kafka({
     factor: 0,
     multiplier: 4,
     maxRetryTime: 25000,
-    retries: 10,
-  },
+    retries: 10
+  }
 })
 
 export default kafka

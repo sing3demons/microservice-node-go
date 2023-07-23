@@ -6,7 +6,7 @@ async function producer(value: string | Buffer | null) {
 
   await producer.send({
     topic: 'test-topic',
-    messages: [{ value: value }],
+    messages: [{ value: value }]
   })
 
   await producer.disconnect()

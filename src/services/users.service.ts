@@ -8,7 +8,10 @@ class UsersService {
     try {
       const { size, skip } = query
 
-      return await this.users.findAll({ skip: Number(skip) | 0, size: Number(size) | 10 })
+      return await this.users.findAll({
+        skip: Number(skip) | 0,
+        size: Number(size) | 10
+      })
     } catch (e: any) {
       throw new Error(e)
     }

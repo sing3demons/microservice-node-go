@@ -9,7 +9,10 @@ const logger = createLogger({
     format.timestamp(),
     format.json(),
     format.printf(
-      (info) => `${dayjs(info.timestamp).format('YYYY-MM-DD HH:mm:ss')} [${info.label}] ${info.level}: ${info.message}`
+      (info) =>
+        `${dayjs(info.timestamp).format('YYYY-MM-DD HH:mm:ss')} [${
+          info.label
+        }] ${info.level}: ${info.message}`
     )
   ),
   transports: [
@@ -19,12 +22,14 @@ const logger = createLogger({
         format.colorize(),
         format.printf(
           (info) =>
-            `${dayjs(info.timestamp).format('YYYY-MM-DD HH:mm:ss')} [${info.label}] ${info.level}: ${info.message}`
+            `${dayjs(info.timestamp).format('YYYY-MM-DD HH:mm:ss')} [${
+              info.label
+            }] ${info.level}: ${info.message}`
         )
-      ),
-    }),
+      )
+    })
   ],
-  defaultMeta: { service: 'user-service' },
+  defaultMeta: { service: 'user-service' }
 })
 
 export default logger

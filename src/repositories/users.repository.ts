@@ -6,33 +6,45 @@ const $prisma = PrismaClient
 class UsersRepository {
   public users = $prisma.user
 
-  private findAllAndCount = async ({ skip, size }: RequestQuery): Promise<UsersResponse> => {
+  private findAllAndCount = async ({
+    skip,
+    size
+  }: RequestQuery): Promise<UsersResponse> => {
     try {
-      const [users, total] = await $prisma.$transaction([this.users.findMany({ take: size, skip }), this.users.count()])
+      const [users, total] = await $prisma.$transaction([
+        this.users.findMany({ take: size, skip }),
+        this.users.count()
+      ])
 
       return {
         users,
-        total,
+        total
       } as UsersResponse
     } catch (error) {
       const users = await this.users.findMany({ take: size, skip })
       const total = await this.users.count()
       return {
         users,
-        total,
+        total
       } as UsersResponse
     }
   }
 
-  public findAll = async ({ skip, size }: RequestQuery): Promise<UsersResponse> => {
+  public findAll = async ({
+    skip,
+    size
+  }: RequestQuery): Promise<UsersResponse> => {
     try {
       // const { users, total }: UsersResponse = await this.findAllAndCount({ skip, size })
-      const [users, total] = await Promise.all([this.users.findMany({ take: size, skip }), this.users.count()])
+      const [users, total] = await Promise.all([
+        this.users.findMany({ take: size, skip }),
+        this.users.count()
+      ])
       // const users = await this.users.findMany({})
       // const total = await this.users.count()
       return {
         users,
-        total,
+        total
       }
     } catch (e: any) {
       console.error(e)
@@ -76,8 +88,8 @@ class UsersRepository {
     try {
       return await this.users.delete({
         where: {
-          id,
-        },
+          id
+        }
       })
     } catch (e: any) {
       throw new Error(e)

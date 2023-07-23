@@ -4,7 +4,7 @@ import { z } from 'zod'
 export const UserRequest = z.object({
   username: z.string(),
   email: z.string().email(),
-  password: z.string(),
+  password: z.string()
 })
 
 export type RequestQuery = {
