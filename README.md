@@ -12,7 +12,12 @@ npx prisma init --datasource-provider mongodb
 yarn add express dotenv
 yarn add @prisma/client
 yarn add winston dayjs
-yarn add kafkajs
+yarn add kafkajs @ladjs/graceful bcrypt jsonwebtoken
+npx eslint --init
+```
+
+```install devDependencies
+yarn add -D @types/kafkajs @types/bcrypt @types/winston @types/dayjs @types/jsonwebtoken
 ```
 
 ### start mongodb #1
@@ -53,4 +58,18 @@ docker compose -f scripts/kafka/docker-compose.yml down
 yarn start
 yarn build
 yarn dev
+```
+
+```.env
+DATABASE_URL="mongodb://mongoset1:27017,mongoset2:27018,mongoset3:27019/my-database?replicaSet=my-replica-set"
+KAFKA_BROKERS="localhost:9092"
+ACCESS_TOKEN_SECRET=<require>
+REFRESH_TOKEN_SECRET=<require>
+```
+
+```vi /private/etc/hosts
+127.0.0.1 mongoset1
+127.0.0.1 mongoset2
+127.0.0.1 mongoset3
+127.0.0.1  mongo1 mongo2 mongo3
 ```

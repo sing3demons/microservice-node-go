@@ -1,18 +1,19 @@
 import { Router } from 'express'
 import UsersController from './controller/users.controller'
+import { decodeToken } from './utils/jwt'
 
-
-const usersRouter = Router()
+const router = Router({ caseSensitive: true })
 const usersController = new UsersController()
 
-usersRouter.get('/users', usersController.getUsers)
+router.post('/auth/register', usersController.register)
+router.post('/auth/sign-in', usersController.login)
 
-usersRouter.get('/users/:id', usersController.getUserById)
+router.get('/users', decodeToken, usersController.getUsers)
 
-usersRouter.post('/users', usersController.createUser)
+router.get('/users/:id', decodeToken, usersController.getUserById)
 
-usersRouter.put('/users/:id', usersController.updateUser)
+router.put('/users/:id', decodeToken, usersController.updateUser)
 
-usersRouter.delete('/users/:id', usersController.deleteUser)
+router.delete('/users/:id', decodeToken, usersController.deleteUser)
 
-export default usersRouter
+export default router
