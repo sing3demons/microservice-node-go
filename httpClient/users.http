@@ -15,7 +15,7 @@ Content-Type: application/json
 Content-Length: 71
 
 {
-    "email": "sing1@dev.com",
+    "email": "sing@dev.com",
     "password": "12345678"
 }
 

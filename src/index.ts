@@ -13,14 +13,17 @@ const port = process.env.PORT || 3000
 const app = express()
 
 app.use(express.json())
-app.get('/', async (req, res) => {
-  // await producer('hello world')
-  res.send('Hello World!')
-})
-app.use('/api', usersRouter)
+app.use(express.urlencoded({ extended: true }))
 
 async function main() {
   await ConnectMongo()
+
+  app.get('/', async (req, res) => {
+    // await producer('hello world')
+    res.send('Hello World!')
+  })
+  app.use('/api', usersRouter)
+
   const server = app.listen(port, () =>
     logger.info(`Server is listening on port ${port}`)
   )

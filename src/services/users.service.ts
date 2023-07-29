@@ -2,7 +2,8 @@ import { RequestQuery, User, UsersResponse } from '../dto/users'
 import UsersRepository from '../repositories/users.repository'
 import { compare, genSalt, hash } from 'bcrypt'
 import { generateJWT } from '../utils/jwt'
-
+import fs from 'fs'
+import { join } from 'path'
 class UsersService {
   private users = new UsersRepository()
 
@@ -141,6 +142,45 @@ class UsersService {
         throw e
       }
       throw e
+    }
+  }
+
+  public updateProfile = async (id: string, data: User) => {
+    try {
+      const user = await this.users.findById(id)
+      if (!user) {
+        throw new Error('User not found')
+      }
+
+      if (data.profile && user.profile) {
+        await this.deleteProfile(user.profile)
+      }
+
+      const u = await this.users.updateUser(id, data)
+
+      if (!u) {
+        throw new Error('Error updating user')
+      }
+      return u
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new Error(e.message)
+      }
+      throw e
+    }
+  }
+
+  private deleteProfile = async (profile: string) => {
+    try {
+      const dir = join(__dirname, '../../public', profile)
+      if (fs.existsSync(dir)) {
+        fs.unlinkSync(dir)
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(error.message)
+      }
+      throw error
     }
   }
 }

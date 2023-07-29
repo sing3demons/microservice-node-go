@@ -86,9 +86,13 @@ class UsersRepository {
     data: User
   ): Promise<User | undefined> => {
     try {
-      return await this.users.update({ where: { id }, data })
+      return await this.users.update({
+        where: { id },
+        data: data
+      })
     } catch (e) {
       if (e instanceof Error) {
+        console.error(e)
         throw new Error(e.message)
       }
     }

@@ -8,6 +8,7 @@ import {
   TokenData,
   TokenDt,
   User,
+  Profile,
   UserRequest,
   UsersResponse
 } from '../dto/users'
@@ -100,6 +101,28 @@ class UsersController {
         return
       }
       JSONResponse.serverError(req, res, 'system error')
+    }
+  }
+  public uploadProfile = async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params
+
+      const body: User = Profile.parse(req.body) as User
+
+      if (req.file?.filename) {
+        body.profile = 'images/' + req.file?.filename
+      }
+
+      if (body?.password) {
+        JSONResponse.badRequest(req, res, 'password cannot be updated')
+        return
+      }
+
+      const update = await this.usersService.updateProfile(id, body)
+
+      JSONResponse.success(req, res, 'success', update)
+    } catch (e) {
+      JSONResponse.serverError(req, res)
     }
   }
 }
