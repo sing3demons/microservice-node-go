@@ -9,7 +9,7 @@ services:
     ports:
       - '3000:3000'
     environment:
-      - DATABASE_URL=mongodb://host.docker.internal:30001/expressAPI?directConnection=true&serverSelectionTimeoutMS=3000
+      - DATABASE_URL=mongodb://mongo1:27017,mongo2:27018,mongo3:27019/mydatabase?replicaSet=my-replica-set
       - KAFKA_BROKERS=kafka:9092
     networks:
       - ms-service

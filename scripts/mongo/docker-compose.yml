@@ -1,42 +1,43 @@
 version: '3.8'
 services:
   mongo1:
-    container_name: mongodb-cluster-1
-    image: mongo:6.0.3
-    command: mongod --replSet mongodb-cluster
+    image: mongo:6
+    container_name: mongo1
+    command: ["--replSet", "my-replica-set", "--bind_ip_all", "--port", "27017"]
+    volumes:
+      - ./data/mongo-1:/data/db
     ports:
-      - '30001:27017'
+      - 27017:27017
     healthcheck:
-      test: test $$(echo "rs.initiate({_id:"mongodb-cluster",members:[{_id:0,host:"mongodb-cluster-1:27017"},{_id:1,host:"mongodb-cluster-2:27017"},{_id:2,host:"mongodb-cluster-3:27017"}]})
+      test: test $$(echo "rs.initiate({_id:'my-replica-set',members:[{_id:0,host:\"mongo1:27017\"},{_id:1,host:\"mongo2:27018\"},{_id:2,host:\"mongo3:27019\"}]}).ok || rs.status().ok" | mongo --port 27017 --quiet) -eq 1
       interval: 10s
       start_period: 30s
-    volumes:
-      - ./data/mongodb-cluster-1:/data/db
     networks:
       - ms-service
   mongo2:
-    container_name: mongodb-cluster-2
-    image: mongo:6.0.3
-    command: mongod --replSet mongodb-cluster
-    ports:
-      - '30002:27017'
+    image: mongo:6
+    container_name: mongo2
+    command: ["--replSet", "my-replica-set", "--bind_ip_all", "--port", "27018"]
     volumes:
-      - ./data/mongodb-cluster-2:/data/db
+      - ./data/mongo-2:/data/db
+    ports:
+      - 27018:27018
     networks:
       - ms-service
+
   mongo3:
-    container_name: mongodb-cluster-3
-    image: mongo:6.0.3
-    command: mongod --replSet mongodb-cluster
-    ports:
-      - '30003:27017'
+    image: mongo:6
+    container_name: mongo3
+    command: ["--replSet", "my-replica-set", "--bind_ip_all", "--port", "27019"]
     volumes:
-      - ./data/mongodb-cluster-3:/data/db
+      - ./data/mongo-3:/data/db
+    ports:
+      - 27019:27019
     networks:
       - ms-service
 networks:
   ms-service:
     name: ms-service
 
-# docker exec -it mongodb-cluster-1 mongosh
-# rs.initiate({_id:"mongodb-cluster",members:[{_id:0,host:"mongodb-cluster-1:27017"},{_id:1,host:"mongodb-cluster-2:27017"},{_id:2,host:"mongodb-cluster-3:27017"}]})
+# docker exec -it mongo1 mongosh
+# docker exec -it mongo1 mongosh --eval "rs.initiate({_id:\"my-replica-set\",members:[{_id:0,host:\"mongo1:27017\"},{_id:1,host:\"mongo2:27018\"},{_id:2,host:\"mongo3:27019\"}]})"

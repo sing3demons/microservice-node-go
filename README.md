@@ -59,3 +59,17 @@ yarn start
 yarn build
 yarn dev
 ```
+
+```.env
+DATABASE_URL="mongodb://mongoset1:27017,mongoset2:27018,mongoset3:27019/my-database?replicaSet=my-replica-set"
+KAFKA_BROKERS="localhost:9092"
+ACCESS_TOKEN_SECRET=<require>
+REFRESH_TOKEN_SECRET=<require>
+```
+
+```vi /private/etc/hosts
+127.0.0.1 mongoset1
+127.0.0.1 mongoset2
+127.0.0.1 mongoset3
+127.0.0.1  mongo1 mongo2 mongo3
+```

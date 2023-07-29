@@ -6,7 +6,7 @@ import logger from './utils/logger'
 // import consumer from './consumer/user.consumer'
 import Graceful from '@ladjs/graceful'
 
-import producer from './producer/users.producer'
+// import producer from './producer/users.producer'
 
 dotenv.config()
 const port = process.env.PORT || 3000
@@ -14,7 +14,7 @@ const app = express()
 
 app.use(express.json())
 app.get('/', async (req, res) => {
-  await producer('hello world')
+  // await producer('hello world')
   res.send('Hello World!')
 })
 app.use('/api', usersRouter)
