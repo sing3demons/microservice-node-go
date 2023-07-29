@@ -11,6 +11,8 @@ services:
     environment:
       - DATABASE_URL=mongodb://mongo1:27017,mongo2:27018,mongo3:27019/mydatabase?replicaSet=my-replica-set
       - KAFKA_BROKERS=kafka:9092
+      - ACCESS_TOKEN_SECRET="secret"
+      - REFRESH_TOKEN_SECRET="secret"
     networks:
       - ms-service
 networks:

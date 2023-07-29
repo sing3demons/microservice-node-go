@@ -15,9 +15,8 @@ Content-Type: application/json
 Content-Length: 71
 
 {
-    "email": "sing@dev.com",
-    "password": "12345678",
-    "username": "sing"
+    "email": "sing1@dev.com",
+    "password": "12345678"
 }
 
 ### Get Token ###

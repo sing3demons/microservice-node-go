@@ -21,3 +21,6 @@ down-kafka:
 down-mongo:
 	docker compose -f scripts/mongo/docker-compose.yml down
 	rm -rf ./scripts/mongo/data
+
+clean-volume:
+	docker volume rm $(docker volume ls -q)

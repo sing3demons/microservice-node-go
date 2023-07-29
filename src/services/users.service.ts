@@ -118,24 +118,29 @@ class UsersService {
       if (e instanceof Error) {
         throw new Error(e.message)
       }
+      throw e
     }
-    throw new Error('Unexpected error occurred while registering user')
   }
 
   public login = async (email: string, password: string) => {
     try {
       const user = await this.users.findUserByEmail(email)
       if (!user) {
-        throw new Error('User not found')
+        throw new Error('not found')
       }
 
       await this.comparePassword(password, user.password)
+      const token = await generateJWT(user)
+      if (!token) {
+        throw new Error('Error generating token')
+      }
 
-      return await generateJWT(user)
+      return token
     } catch (e) {
       if (e instanceof Error) {
-        throw new Error(e.message)
+        throw e
       }
+      throw e
     }
   }
 }

@@ -31,6 +31,11 @@ class Login {
   password!: string
 }
 
+export const LoginRequest = z.object({
+  email: z.string().email(),
+  password: z.string()
+})
+
 interface Sensitive {
   [key: string]: any
 }

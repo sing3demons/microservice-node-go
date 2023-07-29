@@ -21,10 +21,22 @@ function generateJWT(user: User): Promise<Token> | undefined {
       reject(new Error('REFRESH_TOKEN_SECRET is not defined'))
       return
     }
-    const accessToken = jwt.sign(payload, ATS, { expiresIn: '1h' })
-    const refreshToken = jwt.sign(payload, RTS, { expiresIn: '1d' })
+    try {
+      const accessToken = jwt.sign(payload, ATS, { expiresIn: '1h' })
+      if (!accessToken) {
+        reject(new Error('accessToken is not defined'))
+        return
+      }
+      const refreshToken = jwt.sign(payload, RTS, { expiresIn: '1d' })
+      if (!refreshToken) {
+        reject(new Error('refreshToken is not defined'))
+        return
+      }
 
-    resolve({ access_token: accessToken, refresh_token: refreshToken })
+      resolve({ access_token: accessToken, refresh_token: refreshToken })
+    } catch (error) {
+      reject(error)
+    }
   })
 }
 
@@ -49,7 +61,7 @@ function verify(req: TokenData, res: Response, next: NextFunction) {
       req.TokenDt = {
         userId: (decoded as TokenDt).sub,
         role: (decoded as TokenDt).role
-      } 
+      }
       next()
     })
   } catch (error) {

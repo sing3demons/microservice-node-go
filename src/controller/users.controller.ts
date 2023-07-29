@@ -2,6 +2,8 @@ import { Request, Response } from 'express'
 import UsersService from '../services/users.service'
 
 import {
+  Login,
+  LoginRequest,
   RequestQuery,
   TokenData,
   TokenDt,
@@ -88,11 +90,16 @@ class UsersController {
 
   public login = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { email, password } = req.body
-      const token = await this.usersService.login(email, password)
+      const body = LoginRequest.parse(req.body) as Login
+      const token = await this.usersService.login(body.email, body.password)
+
       JSONResponse.success(req, res, 'success', token)
     } catch (e) {
-      JSONResponse.serverError(req, res)
+      if (e instanceof Error) {
+        JSONResponse.unauthorized(req, res, 'unauthorized')
+        return
+      }
+      JSONResponse.serverError(req, res, 'system error')
     }
   }
 }
