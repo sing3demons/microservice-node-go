@@ -1,8 +1,10 @@
 import { Request, Response } from 'express'
-import logger from './logger'
 import { Sensitive } from '../dto/users'
+import Logger from '../logger'
 
 class JSONResponse {
+  private static logger = new Logger()
+
   static success(req: Request, res: Response, message: string, data?: object) {
     req.body.password && delete req.body.password
 
@@ -10,11 +12,11 @@ class JSONResponse {
       if (Object.prototype.hasOwnProperty.call(data, 'users')) {
         const users = (data as Sensitive)['users']
         users.forEach((item: Sensitive) => {
-         if (Object.prototype.hasOwnProperty.call(data, 'password')) {
-           if ((item as Sensitive)['password']) {
-             delete (item as Sensitive)['password']
-           }
-         }
+          if (Object.prototype.hasOwnProperty.call(data, 'password')) {
+            if ((item as Sensitive)['password']) {
+              delete (item as Sensitive)['password']
+            }
+          }
         })
       } else if (typeof data === 'object' && data !== null) {
         if (Object.prototype.hasOwnProperty.call(data, 'password')) {
@@ -24,16 +26,16 @@ class JSONResponse {
         }
       }
     }
-    logger.info(
-      JSON.stringify({
-        ip: req.ip,
-        method: req.method,
-        url: req.url,
-        query: req.query,
-        body: req.body,
-        data: data
-      })
-    )
+
+    this.logger.info(req.url, {
+      ip: req.ip,
+      method: req.method,
+      url: req.url,
+      query: req.query,
+      body: req.body,
+      data: data
+    })
+
     res.status(200).json({
       code: 200,
       message: message || 'success',
@@ -43,16 +45,14 @@ class JSONResponse {
 
   static create(req: Request, res: Response, message: string, data: object) {
     req.body.password && delete req.body.password
+    this.logger.info(req.url, {
+      ip: req.ip,
+      method: req.method,
+      url: req.url,
+      body: req.body,
+      data: data
+    })
 
-    logger.info(
-      JSON.stringify({
-        ip: req.ip,
-        method: req.method,
-        url: req.url,
-        body: req.body,
-        data: data
-      })
-    )
     res.status(201).json({
       code: 201,
       message: message || 'created',
@@ -70,16 +70,14 @@ class JSONResponse {
       delete req.body.password
     }
 
-    logger.info(
-      JSON.stringify({
-        ip: req.ip,
-        method: req.method,
-        url: req.url,
-        query: req.query,
-        body: req.body,
-        data: data
-      })
-    )
+    this.logger.info(req.url, {
+      ip: req.ip,
+      method: req.method,
+      url: req.url,
+      query: req.query,
+      body: req.body,
+      data: data
+    })
 
     res.status(400).json({
       code: 400,
@@ -89,14 +87,13 @@ class JSONResponse {
   }
 
   static notFound(req: Request, res: Response, message: string) {
-    logger.info(
-      JSON.stringify({
-        ip: req.ip,
-        method: req.method,
-        url: req.url,
-        query: req.query
-      })
-    )
+    this.logger.info(req.url, {
+      ip: req.ip,
+      method: req.method,
+      url: req.url,
+      query: req.query
+    })
+
     res.status(404).json({
       code: 404,
       message: message || 'not found'
@@ -104,14 +101,12 @@ class JSONResponse {
   }
 
   static unauthorized(req: Request, res: Response, message: string) {
-    logger.info(
-      JSON.stringify({
-        ip: req.ip,
-        method: req.method,
-        url: req.url,
-        query: req.query
-      })
-    )
+    this.logger.info(req.url, {
+      ip: req.ip,
+      method: req.method,
+      url: req.url,
+      query: req.query
+    })
     res.status(401).json({
       code: 401,
       message: message || 'unauthorized'
@@ -119,14 +114,12 @@ class JSONResponse {
   }
 
   static forbidden(req: Request, res: Response, message: string) {
-    logger.info(
-      JSON.stringify({
-        ip: req.ip,
-        method: req.method,
-        url: req.url,
-        query: req.query
-      })
-    )
+    this.logger.info(req.url, {
+      ip: req.ip,
+      method: req.method,
+      url: req.url,
+      query: req.query
+    })
     res.status(403).json({
       code: 403,
       message: message || 'forbidden'
@@ -139,15 +132,14 @@ class JSONResponse {
     message?: string,
     data?: object
   ) {
-    logger.info(
-      JSON.stringify({
-        ip: req.ip,
-        method: req.method,
-        url: req.url,
-        query: req.query,
-        data: data
-      })
-    )
+    this.logger.info(req.url, {
+      ip: req.ip,
+      method: req.method,
+      url: req.url,
+      query: req.query,
+      data: data
+    })
+
     res.status(500).json({
       code: 500,
       message: message || 'internal server error',

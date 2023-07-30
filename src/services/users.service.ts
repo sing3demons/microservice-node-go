@@ -4,6 +4,7 @@ import { compare, genSalt, hash } from 'bcrypt'
 import { generateJWT } from '../utils/jwt'
 import fs from 'fs'
 import { join } from 'path'
+
 class UsersService {
   private users = new UsersRepository()
 
@@ -172,6 +173,7 @@ class UsersService {
 
   private deleteProfile = async (profile: string) => {
     try {
+      console.log('===============>', process.cwd(), '<====================')
       const dir = join(__dirname, '../../public', profile)
       if (fs.existsSync(dir)) {
         fs.unlinkSync(dir)

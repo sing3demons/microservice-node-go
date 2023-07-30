@@ -3,6 +3,7 @@ import path from 'path'
 import fs from 'fs'
 import { TokenData, TokenDt } from '../dto/users'
 import { Request } from 'express'
+import { NanoIdService } from './nanoid'
 const rootDir = path.join('public', 'images')
 
 if (!fs.existsSync(rootDir)) {
@@ -25,9 +26,8 @@ const storage = multer.diskStorage({
     }
 
     const subString = userId.substring(3, 8)
-    const fileName = `${Date.now()}-${subString}-${Math.round(
-      Math.random() * 1e9
-    )}.png`
+    const nano = new NanoIdService()
+    const fileName = `${Date.now()}-${subString}-${nano.randomNanoId()}.png`
     cb(null, fileName)
   }
 })
