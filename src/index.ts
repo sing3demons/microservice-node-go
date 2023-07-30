@@ -1,9 +1,10 @@
 import express from 'express'
 import dotenv from 'dotenv'
-import usersRouter from './router'
 import Prisma from './connect'
 import logger from './utils/logger'
-
+import usersRouter from './router'
+import helmet from 'helmet'
+import JSONResponse from './utils/response'
 
 // import consumer from './consumer/user.consumer'
 // import producer from './producer/users.producer'
@@ -17,20 +18,23 @@ class Server {
 
   constructor() {
     this._prisma.connectDB()
-
     this.app = express()
     this.config()
   }
 
   public config(): void {
     this.app.set('port', process.env.PORT || 3000)
-    this.app.use(express.json())
+    this.app.use(helmet())
+    this.app.use(express.json({}))
     this.app.use(express.urlencoded({ extended: true }))
-    // this.router()
-    this.app.use('/api', usersRouter)
+    this.app.use('/images', express.static('public/images'))
+    this.router()
+    this.app.use((req, res) => {
+      JSONResponse.notFound(req, res, 'Not found')
+    })
   }
 
-  public router = (): void => {
+  public router(): void {
     this.app.use('/api', usersRouter)
   }
 

@@ -12,6 +12,7 @@ import {
   UserRequest,
   UsersResponse
 } from '../dto/users'
+
 import JSONResponse from '../utils/response'
 
 class UsersController {
