@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
-import { Sensitive } from '../dto/users'
 import Logger from './logger'
+import { Sensitive } from '../dto'
 
 class JSONResponse {
   private static logger = Logger

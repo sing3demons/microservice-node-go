@@ -5,12 +5,25 @@ import logger from './utils/logger'
 import usersRouter from './router'
 import helmet from 'helmet'
 import JSONResponse from './utils/response'
-
+import promBundle from 'express-prom-bundle'
 // import consumer from './consumer/user.consumer'
 // import producer from './producer/users.producer'
 
 dotenv.config()
 const prisma = new Prisma()
+const metricsMiddleware = promBundle({
+  includeMethod: true,
+  includePath: true,
+  includeStatusCode: true,
+  includeUp: true,
+  customLabels: {
+    project_name: 'users-service',
+    project_type: 'users-service_metrics_labels'
+  },
+  promClient: {
+    collectDefaultMetrics: {}
+  }
+})
 
 class Server {
   public app: express.Application
@@ -27,6 +40,7 @@ class Server {
     this.app.use(helmet())
     this.app.use(express.json({}))
     this.app.use(express.urlencoded({ extended: true }))
+    this.app.use(metricsMiddleware)
     this.app.use('/images', express.static('public/images'))
     this.router()
     this.app.use((req, res) => {

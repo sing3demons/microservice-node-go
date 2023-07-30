@@ -1,31 +1,28 @@
 import jwt from 'jsonwebtoken'
-import Prisma, { User } from '../connect'
-const { prisma } = new Prisma()
-const UserToken = prisma.userToken
+import path from 'path'
+import fs from 'fs'
+import { PayloadToken } from '../dto/jwt'
 
-const generateTokens = async (user: User) => {
-  try {
-    const payload = { _id: user.id, roles: user.roles }
-    const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET!, {
-      expiresIn: '14m'
-    })
-    const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET!, {
-      expiresIn: '30d'
-    })
+const privateKey = fs.readFileSync(
+  path.join(__dirname, '../../', 'keys', 'rsa.key'),
+  'utf8'
+)
+const publicKey = fs.readFileSync(
+  path.join(__dirname, '../../', 'keys', 'rsa.key.pub'),
+  'utf8'
+)
 
-    const userToken = await UserToken.findFirst({ where: { userId: user.id } })
-    if (userToken) await UserToken.delete({ where: { id: userToken.id } })
+export default class TokenJWT {
+  static signToken(payload: PayloadToken, expire?: string): string {
+    const token = jwt.sign(payload, privateKey, {
+      algorithm: 'RS256',
+      expiresIn: expire ? expire : '1h'
+    })
+    return token
+  }
 
-    await UserToken.create({
-      data: { userId: user.id, token: refreshToken }
-    })
-    return Promise.resolve({
-      access_token: accessToken,
-      refresh_token: refreshToken
-    })
-  } catch (err) {
-    return Promise.reject(err)
+  static verifyToken(token: string): string | jwt.JwtPayload {
+    const decoded = jwt.verify(token, publicKey, { algorithms: ['RS256'] })
+    return decoded
   }
 }
-
-export default generateTokens

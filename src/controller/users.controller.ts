@@ -5,8 +5,6 @@ import {
   Login,
   LoginRequest,
   RequestQuery,
-  TokenData,
-  TokenDt,
   User,
   Profile,
   UserRequest,
@@ -14,6 +12,7 @@ import {
 } from '../dto/users'
 
 import JSONResponse from '../utils/response'
+import { TokenData, TokenDt } from '../dto/jwt'
 
 class UsersController {
   public usersService = new UsersService()

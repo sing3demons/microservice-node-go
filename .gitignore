@@ -136,3 +136,5 @@ dist
 
 scripts/mongo/data
 public
+*key
+*key.pub

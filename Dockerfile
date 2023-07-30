@@ -1,9 +1,8 @@
 FROM node:16.17.0-alpine
-RUN apk update
-RUN apk add git
+RUN apk update && apk add git
 ENV TZ=Asia/Bangkok
 WORKDIR /usr/src/app
-COPY package.json ./
+COPY package*.json ./
 RUN npm install
 COPY . .
 RUN git log -1 > APPLICATION_VERSION.txt
