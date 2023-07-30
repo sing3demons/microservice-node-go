@@ -69,4 +69,36 @@ function verify(req: TokenData, res: Response, next: NextFunction) {
   }
 }
 
-export { generateJWT, decodeToken }
+export default class JWTTokens {
+  public static generateToken = generateJWT
+  private static decodeToken = decodeToken
+
+  public static verifyToken = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      if (!req.headers['authorization'])
+        return JSONResponse.unauthorized(req, res, 'Unauthorized')
+
+      const token = req.headers['authorization'].replace('Bearer ', '')
+      const secret: jwt.Secret | undefined = process.env.ACCESS_TOKEN_SECRET
+      if (!secret) {
+        JSONResponse.unauthorized(req, res, 'Unauthorized')
+        return
+      }
+
+      jwt.verify(token, secret, (err, decoded) => {
+        if (err) return JSONResponse.unauthorized(req, res, 'Unauthorized')
+        req.user = {
+          userId: (decoded as TokenDt).sub,
+          role: (decoded as TokenDt).role
+        }
+        next()
+      })
+    } catch (error) {
+      return JSONResponse.unauthorized(req, res, 'Unauthorized')
+    }
+  }
+}

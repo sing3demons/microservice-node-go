@@ -27,3 +27,12 @@ enum RoleValue {
   ADMIN
   USER
 }
+
+model UserToken {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  userId    String   @db.ObjectId
+  token     String
+
+  @@map("user_tokens")
+}

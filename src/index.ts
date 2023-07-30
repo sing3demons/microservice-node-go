@@ -1,41 +1,54 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import usersRouter from './router'
-import prisma, { ConnectMongo } from './connect'
+import Prisma from './connect'
 import logger from './utils/logger'
-// import consumer from './consumer/user.consumer'
-import Graceful from '@ladjs/graceful'
 
+
+// import consumer from './consumer/user.consumer'
 // import producer from './producer/users.producer'
 
 dotenv.config()
-const port = process.env.PORT || 3000
-const app = express()
+const prisma = new Prisma()
 
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
+class Server {
+  public app: express.Application
+  private readonly _prisma = prisma
 
-async function main() {
-  await ConnectMongo()
+  constructor() {
+    this._prisma.connectDB()
 
-  app.get('/', async (req, res) => {
-    // await producer('hello world')
-    res.send('Hello World!')
-  })
-  app.use('/api', usersRouter)
+    this.app = express()
+    this.config()
+  }
 
-  const server = app.listen(port, () =>
-    logger.info(`Server is listening on port ${port}`)
-  )
-  // await consumer()
-  new Graceful({ servers: [server] }).listen()
+  public config(): void {
+    this.app.set('port', process.env.PORT || 3000)
+    this.app.use(express.json())
+    this.app.use(express.urlencoded({ extended: true }))
+    // this.router()
+    this.app.use('/api', usersRouter)
+  }
+
+  public router = (): void => {
+    this.app.use('/api', usersRouter)
+  }
+
+  public start = async () => {
+    this.app.listen(this.app.get('port'), () => {
+      logger.info(`Server is listening on port ${this.app.get('port')}`)
+    })
+    // await consumer()
+  }
 }
 
-main()
+const server = new Server()
+server
+  .start()
   .catch(async (e) => {
     logger.error(JSON.stringify(e.message))
     process.exit(1)
   })
   .finally(async () => {
-    await prisma.$disconnect()
+    await prisma.prisma.$disconnect()
   })

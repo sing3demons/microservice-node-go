@@ -1,9 +1,9 @@
 import { RequestQuery, User, UsersResponse } from '../dto/users'
 import UsersRepository from '../repositories/users.repository'
 import { compare, genSalt, hash } from 'bcrypt'
-import { generateJWT } from '../utils/jwt'
 import fs from 'fs'
 import { join } from 'path'
+import JWTTokens from '../utils/jwt'
 
 class UsersService {
   private users = new UsersRepository()
@@ -132,7 +132,7 @@ class UsersService {
       }
 
       await this.comparePassword(password, user.password)
-      const token = await generateJWT(user)
+      const token = await JWTTokens.generateToken(user)
       if (!token) {
         throw new Error('Error generating token')
       }

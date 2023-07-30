@@ -1,9 +1,9 @@
 import { Request, Response } from 'express'
 import { Sensitive } from '../dto/users'
-import Logger from '../logger'
+import Logger from './logger'
 
 class JSONResponse {
-  private static logger = new Logger()
+  private static logger = Logger
 
   static success(req: Request, res: Response, message: string, data?: object) {
     req.body.password && delete req.body.password
@@ -27,14 +27,16 @@ class JSONResponse {
       }
     }
 
-    this.logger.info(req.url, {
-      ip: req.ip,
-      method: req.method,
-      url: req.url,
-      query: req.query,
-      body: req.body,
-      data: data
-    })
+    this.logger.info(
+      JSON.stringify({
+        ip: req.ip,
+        method: req.method,
+        url: req.url,
+        query: req.query,
+        body: req.body,
+        data: data
+      })
+    )
 
     res.status(200).json({
       code: 200,
@@ -45,13 +47,15 @@ class JSONResponse {
 
   static create(req: Request, res: Response, message: string, data: object) {
     req.body.password && delete req.body.password
-    this.logger.info(req.url, {
-      ip: req.ip,
-      method: req.method,
-      url: req.url,
-      body: req.body,
-      data: data
-    })
+    this.logger.info(
+      JSON.stringify({
+        ip: req.ip,
+        method: req.method,
+        url: req.url,
+        body: req.body,
+        data: data
+      })
+    )
 
     res.status(201).json({
       code: 201,
@@ -70,14 +74,16 @@ class JSONResponse {
       delete req.body.password
     }
 
-    this.logger.info(req.url, {
-      ip: req.ip,
-      method: req.method,
-      url: req.url,
-      query: req.query,
-      body: req.body,
-      data: data
-    })
+    this.logger.info(
+      JSON.stringify({
+        ip: req.ip,
+        method: req.method,
+        url: req.url,
+        query: req.query,
+        body: req.body,
+        data: data
+      })
+    )
 
     res.status(400).json({
       code: 400,
@@ -87,12 +93,14 @@ class JSONResponse {
   }
 
   static notFound(req: Request, res: Response, message: string) {
-    this.logger.info(req.url, {
-      ip: req.ip,
-      method: req.method,
-      url: req.url,
-      query: req.query
-    })
+    this.logger.error(
+      JSON.stringify({
+        ip: req.ip,
+        method: req.method,
+        url: req.url,
+        query: req.query
+      })
+    )
 
     res.status(404).json({
       code: 404,
@@ -101,12 +109,15 @@ class JSONResponse {
   }
 
   static unauthorized(req: Request, res: Response, message: string) {
-    this.logger.info(req.url, {
-      ip: req.ip,
-      method: req.method,
-      url: req.url,
-      query: req.query
-    })
+    this.logger.error(
+      JSON.stringify({
+        ip: req.ip,
+        method: req.method,
+        url: req.url,
+        query: req.query
+      })
+    )
+
     res.status(401).json({
       code: 401,
       message: message || 'unauthorized'

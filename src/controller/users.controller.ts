@@ -40,8 +40,18 @@ class UsersController {
 
   public getUserById = async (req: Request, res: Response): Promise<void> => {
     try {
-      //   const { userId }: TokenDt = req
+      const { userId }: any = req.user
+      if (!userId) {
+        JSONResponse.unauthorized(req, res, 'unauthorized')
+        return
+      }
+
+      if (!req.params.id || req.params.id === 'profile') {
+        req.params.id = userId
+      }
+
       const { id } = req.params
+
       const user: User | null = await this.usersService.getUserById(id)
       if (!user) {
         JSONResponse.notFound(req, res, 'user not found')
