@@ -4,11 +4,11 @@ import fs from 'fs'
 import { PayloadToken } from '../dto/jwt'
 
 const privateKey = fs.readFileSync(
-  path.join(__dirname, '../../', 'keys', 'rsa.key'),
+  path.join(__dirname, '../', 'keys', 'rsa.key'),
   'utf8'
 )
 const publicKey = fs.readFileSync(
-  path.join(__dirname, '../../', 'keys', 'rsa.key.pub'),
+  path.join(__dirname, '../', 'keys', 'rsa.key.pub'),
   'utf8'
 )
 

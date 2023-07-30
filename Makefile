@@ -27,6 +27,6 @@ clean-volume:
 	docker volume rm $(docker volume ls -q)
 
 keygen:
-	mkdir keys
-	ssh-keygen -t rsa -b 2048 -m PEM -f keys/rsa.key
-	openssl rsa -in keys/rsa.key -pubout -outform PEM -out keys/rsa.key.pub
+	mkdir src/keys
+	ssh-keygen -t rsa -b 2048 -m PEM -f src/keys/rsa.key
+	openssl rsa -in src/keys/rsa.key -pubout -outform PEM -out src/keys/rsa.key.pub
