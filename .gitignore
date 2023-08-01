@@ -136,5 +136,4 @@ dist
 
 scripts/mongo/data
 public
-*key
-*key.pub
+package-lock.json

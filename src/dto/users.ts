@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { User as user } from '@prisma/client'
 import { z } from 'zod'
 

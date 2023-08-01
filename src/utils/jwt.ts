@@ -2,8 +2,23 @@ import jwt from 'jsonwebtoken'
 import { NextFunction, Request, Response } from 'express'
 import { User } from '../dto/users'
 import JSONResponse from './response'
-import TokenJWT from './generateTokens'
+// import TokenJWT from './generateTokens'
+import TokenJWT from '@node-auth-jwt/sing3demons'
 import { PayloadToken, Token, TokenData, TokenDt } from '../dto/jwt'
+import path from 'path'
+import fs from 'fs'
+
+const privateKey = fs.readFileSync(
+  path.join(__dirname, '../../', 'keys', 'rsa.key'),
+  'utf8'
+)
+const publicKey = fs.readFileSync(
+  path.join(__dirname, '../../', 'keys', 'rsa.key.pub'),
+  'utf8'
+)
+
+
+const jwtToken = new TokenJWT(privateKey, publicKey)
 
 function generateJWT(user: User): Promise<Token> | undefined {
   return new Promise<Token>((resolve, reject) => {
@@ -13,25 +28,15 @@ function generateJWT(user: User): Promise<Token> | undefined {
       role: user.roles
     }
 
-    // const ATS: jwt.Secret | undefined = process.env.ACCESS_TOKEN_SECRET
-    // if (!ATS) {
-    //   reject(new Error('ACCESS_TOKEN_SECRET is not defined'))
-    //   return
-    // }
-    // const RTS: jwt.Secret | undefined = process.env.REFRESH_TOKEN_SECRET
-    // if (!RTS) {
-    //   reject(new Error('REFRESH_TOKEN_SECRET is not defined'))
-    //   return
-    // }
     try {
-      // const accessToken = jwt.sign(payload, ATS, { expiresIn: '1h' })
-      const accessToken = TokenJWT.signToken(payload)
+      const accessToken = jwtToken.signToken(payload)
+      console.log('accessToken', accessToken)
       if (!accessToken) {
         reject(new Error('accessToken is not defined'))
         return
       }
       // const refreshToken = jwt.sign(payload, RTS, { expiresIn: '1d' })
-      const refreshToken = TokenJWT.signToken(payload, '1d')
+      const refreshToken = jwtToken.signToken(payload, '1d')
       if (!refreshToken) {
         reject(new Error('refreshToken is not defined'))
         return
@@ -93,7 +98,7 @@ export default class JWTTokens {
         return
       }
 
-      const payload = TokenJWT.verifyToken(token)
+      const payload = jwtToken.verifyToken(token)
       if (!payload) {
         JSONResponse.unauthorized(req, res, 'Unauthorized')
         return
@@ -104,6 +109,7 @@ export default class JWTTokens {
         role: payload as PayloadToken['role'],
         username: (payload as PayloadToken).username
       }
+
       next()
     } catch (error) {
       return JSONResponse.unauthorized(req, res, 'Unauthorized')

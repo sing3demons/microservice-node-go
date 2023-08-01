@@ -6,6 +6,7 @@ import usersRouter from './routes'
 import helmet from 'helmet'
 import JSONResponse from './utils/response'
 import promBundle from 'express-prom-bundle'
+import cors from 'cors'
 // import consumer from './consumer/user.consumer'
 // import producer from './producer/users.producer'
 
@@ -38,6 +39,11 @@ class Server {
   public config(): void {
     this.app.set('port', process.env.PORT || 3000)
     this.app.use(helmet())
+    this.app.use(
+      cors({
+        origin: '*'
+      })
+    )
     this.app.use(express.json({}))
     this.app.use(express.urlencoded({ extended: true }))
     this.app.use(metricsMiddleware)
