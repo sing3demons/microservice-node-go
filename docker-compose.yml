@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     image: sing3demons/user-service
     ports:
-      - '3000:3000'
+      - '8000:3000'
     environment:
       - DATABASE_URL=mongodb://mongo1:27017,mongo2:27018,mongo3:27019/mydatabase?replicaSet=my-replica-set
       - KAFKA_BROKERS=kafka:9092
@@ -15,6 +15,10 @@ services:
       - REFRESH_TOKEN_SECRET="secret"
     networks:
       - ms-service
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: host.docker.internal:24224
 networks:
   ms-service:
    name: ms-service

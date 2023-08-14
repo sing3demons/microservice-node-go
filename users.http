@@ -1,21 +1,23 @@
-POST http://localhost:3000/api/auth/register HTTP/1.1
+@url = http://localhost:8000/api
+
+POST {{url}}/auth/register HTTP/1.1
 Content-Type: application/json
 Content-Length: 71
 
 {
-    "email": "sing1@dev.com",
+    "email": "sing@dev.com",
     "password": "12345678",
     "username": "sing"
 }
 
 ###
 # @name auth
-POST http://localhost:3000/api/auth/sign-in HTTP/1.1
+POST {{url}}/auth/sign-in HTTP/1.1
 Content-Type: application/json
 Content-Length: 71
 
 {
-    "email": "sing1@dev.com",
+    "email": "sing@dev.com",
     "password": "12345678"
 }
 
@@ -23,17 +25,17 @@ Content-Length: 71
 @token = {{auth.response.body.$.data.$.access_token}}
 
 ###
-GET http://localhost:3000/api/users HTTP/1.1
+GET {{url}}/users HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 ###
-GET http://localhost:3000/api/users/profile HTTP/1.1
+GET {{url}}/users/profile HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 ###
-DELETE  http://localhost:3000/api/users/64bd2ce6495e23f11400628f HTTP/1.1
+DELETE  {{url}}/users/64bd2ce6495e23f11400628f HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer {{token}}
 

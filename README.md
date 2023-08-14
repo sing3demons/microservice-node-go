@@ -1,5 +1,13 @@
 # nodejs_prisma
 
+## start-app
+
+```start-app
+make start
+make love
+make start-app
+```
+
 ```
 yarn init -y
 npx tsc --init
