@@ -7,6 +7,7 @@ import helmet from 'helmet'
 import JSONResponse from './utils/response'
 import promBundle from 'express-prom-bundle'
 import cors from 'cors'
+import rateLimit from 'express-rate-limit'
 // import consumer from './consumer/user.consumer'
 // import producer from './producer/users.producer'
 
@@ -24,6 +25,13 @@ const metricsMiddleware = promBundle({
   promClient: {
     collectDefaultMetrics: {}
   }
+})
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 500,
+  standardHeaders: true,
+  legacyHeaders: false
 })
 
 class Server {
@@ -44,6 +52,7 @@ class Server {
         origin: '*'
       })
     )
+    this.app.use(limiter)
     this.app.use(express.json({}))
     this.app.use(express.urlencoded({ extended: true }))
     this.app.use(metricsMiddleware)
@@ -63,9 +72,6 @@ class Server {
     server.app.listen(server.app.get('port'), () => {
       logger.info(`Server is listening on port ${server.app.get('port')}`)
     })
-    // this.app.listen(this.app.get('port'), () => {
-    //   logger.info(`Server is listening on port ${this.app.get('port')}`)
-    // })
     // await consumer()
   }
 }
