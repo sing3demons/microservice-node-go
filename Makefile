@@ -25,6 +25,8 @@ start-grafana:
 	docker compose -f scripts/grafana/docker-compose.yml up -d
 start-fluent-bit:
 	docker compose -f scripts/fluent-bit/docker-compose.yml up -d
+start-metrics:
+	docker compose -f scripts/prometheus/docker-compose.yml up -d
 
 start-app:
 	docker compose up -d --build
@@ -37,6 +39,8 @@ down-grafana:
 	docker compose -f scripts/grafana/docker-compose.yml down
 down-fluent-bit:
 	docker compose -f scripts/fluent-bit/docker-compose.yml down
+down-metrics:
+	docker compose -f scripts/prometheus/docker-compose.yml down
 down-app:
 	docker compose down
 
@@ -50,7 +54,7 @@ keygen:
 
 start-log : start-grafana start-fluent-bit
 
-love : start-mongo mongo-init start-grafana start-fluent-bit start-app
+love : start-mongo mongo-init start-grafana start-fluent-bit start-metrics start-app 
 	@echo "I love you"
-kill : down-app down-grafana down-fluent-bit down-kafka down-mongo
+kill : down-app down-grafana down-fluent-bit down-kafka down-mongo down-metrics
 	@echo "I hate you"

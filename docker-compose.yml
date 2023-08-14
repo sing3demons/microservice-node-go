@@ -1,7 +1,8 @@
 version: '3.8'
 services:
-  server:
+  user-service:
     container_name: user-service
+    hostname: user-service
     build:
       context: .
       dockerfile: Dockerfile
@@ -22,3 +23,4 @@ services:
 networks:
   ms-service:
    name: ms-service
+   external: true

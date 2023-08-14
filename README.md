@@ -2,10 +2,9 @@
 
 ## start-app
 
-```start-app
-make start
+```start-down
 make love
-make start-app
+make kill
 ```
 
 ```
