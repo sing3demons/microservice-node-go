@@ -135,3 +135,5 @@ dist
 .pnp.*
 
 scripts/mongo/data
+public
+package-lock.json

@@ -1,7 +1,9 @@
 import { RequestQuery, User, UsersResponse } from '../dto/users'
 import UsersRepository from '../repositories/users.repository'
 import { compare, genSalt, hash } from 'bcrypt'
-import { generateJWT } from '../utils/jwt'
+import fs from 'fs'
+import { join } from 'path'
+import JWTTokens from '../utils/jwt'
 
 class UsersService {
   private users = new UsersRepository()
@@ -118,24 +120,69 @@ class UsersService {
       if (e instanceof Error) {
         throw new Error(e.message)
       }
+      throw e
     }
-    throw new Error('Unexpected error occurred while registering user')
   }
 
   public login = async (email: string, password: string) => {
     try {
       const user = await this.users.findUserByEmail(email)
       if (!user) {
-        throw new Error('User not found')
+        throw new Error('not found')
       }
 
       await this.comparePassword(password, user.password)
+      const token = await JWTTokens.generateToken(user)
+      if (!token) {
+        throw new Error('Error generating token')
+      }
 
-      return await generateJWT(user)
+      return token
+    } catch (e) {
+      if (e instanceof Error) {
+        throw e
+      }
+      throw e
+    }
+  }
+
+  public updateProfile = async (id: string, data: User) => {
+    try {
+      const user = await this.users.findById(id)
+      if (!user) {
+        throw new Error('User not found')
+      }
+
+      if (data.profile && user.profile) {
+        await this.deleteProfile(user.profile)
+      }
+
+      const u = await this.users.updateUser(id, data)
+
+      if (!u) {
+        throw new Error('Error updating user')
+      }
+      return u
     } catch (e) {
       if (e instanceof Error) {
         throw new Error(e.message)
       }
+      throw e
+    }
+  }
+
+  private deleteProfile = async (profile: string) => {
+    try {
+      console.log('===============>', process.cwd(), '<====================')
+      const dir = join(__dirname, '../../public', profile)
+      if (fs.existsSync(dir)) {
+        fs.unlinkSync(dir)
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(error.message)
+      }
+      throw error
     }
   }
 }

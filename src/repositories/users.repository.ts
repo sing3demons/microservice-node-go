@@ -1,17 +1,17 @@
 // import { PrismaClient, User } from '@prisma/client'
 import PrismaClient, { User } from '../connect'
 import { RequestQuery, UsersResponse } from '../dto/users'
-const $prisma = PrismaClient
+const { prisma } = new PrismaClient()
 
 class UsersRepository {
-  public users = $prisma.user
+  private readonly users = prisma.user
 
   private findAllAndCount = async ({
     skip,
     size
   }: RequestQuery): Promise<UsersResponse> => {
     try {
-      const [users, total] = await $prisma.$transaction([
+      const [users, total] = await prisma.$transaction([
         this.users.findMany({ take: size, skip }),
         this.users.count()
       ])
@@ -86,9 +86,13 @@ class UsersRepository {
     data: User
   ): Promise<User | undefined> => {
     try {
-      return await this.users.update({ where: { id }, data })
+      return await this.users.update({
+        where: { id },
+        data: data
+      })
     } catch (e) {
       if (e instanceof Error) {
+        console.error(e)
         throw new Error(e.message)
       }
     }

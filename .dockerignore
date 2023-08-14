@@ -23,3 +23,5 @@ LICENSE
 README.md
 scripts
 yarn.lock
+.DS_Store
+.eslintignore

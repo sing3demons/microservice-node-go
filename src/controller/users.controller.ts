@@ -2,14 +2,17 @@ import { Request, Response } from 'express'
 import UsersService from '../services/users.service'
 
 import {
+  Login,
+  LoginRequest,
   RequestQuery,
-  TokenData,
-  TokenDt,
   User,
+  Profile,
   UserRequest,
   UsersResponse
 } from '../dto/users'
+
 import JSONResponse from '../utils/response'
+import { TokenData, TokenDt } from '../dto/jwt'
 
 class UsersController {
   public usersService = new UsersService()
@@ -37,8 +40,18 @@ class UsersController {
 
   public getUserById = async (req: Request, res: Response): Promise<void> => {
     try {
-      //   const { userId }: TokenDt = req
+      const { userId }: any = req.user
+      if (!userId) {
+        JSONResponse.unauthorized(req, res, 'unauthorized')
+        return
+      }
+
+      if (!req.params.id || req.params.id === 'profile') {
+        req.params.id = userId
+      }
+
       const { id } = req.params
+
       const user: User | null = await this.usersService.getUserById(id)
       if (!user) {
         JSONResponse.notFound(req, res, 'user not found')
@@ -88,9 +101,36 @@ class UsersController {
 
   public login = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { email, password } = req.body
-      const token = await this.usersService.login(email, password)
+      const body = LoginRequest.parse(req.body) as Login
+      const token = await this.usersService.login(body.email, body.password)
+
       JSONResponse.success(req, res, 'success', token)
+    } catch (e) {
+      if (e instanceof Error) {
+        JSONResponse.unauthorized(req, res, 'unauthorized')
+        return
+      }
+      JSONResponse.serverError(req, res, 'system error')
+    }
+  }
+  public uploadProfile = async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params
+
+      const body: User = Profile.parse(req.body) as User
+
+      if (req.file?.filename) {
+        body.profile = 'images/' + req.file?.filename
+      }
+
+      if (body?.password) {
+        JSONResponse.badRequest(req, res, 'password cannot be updated')
+        return
+      }
+
+      const update = await this.usersService.updateProfile(id, body)
+
+      JSONResponse.success(req, res, 'success', update)
     } catch (e) {
       JSONResponse.serverError(req, res)
     }

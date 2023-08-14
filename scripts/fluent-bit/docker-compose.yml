@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  fluent-bit:
+    image: grafana/fluent-bit-plugin-loki:latest
+    container_name: fluent-bit
+    environment:
+      - LOKI_URL=http://loki:3100/loki/api/v1/push
+    volumes:
+      - ./fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+    expose:
+      - 24224
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    networks:
+      - ms-service
+
+networks:
+  ms-service:
+   name: ms-service
