@@ -35,4 +35,7 @@ networks:
   ms-service:
    name: ms-service
 
-# Loki = http://loki:3100
+# Loki = http://loki:3100 
+
+# dashboards -> 16306
+# https://grafana.com/grafana/dashboards/16306-express-prometheus-middleware/
