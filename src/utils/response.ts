@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import Logger from './logger'
 import { Sensitive } from '../dto'
+import { maskEmail } from './sensitive'
 
 class JSONResponse {
   private static logger = Logger
@@ -8,13 +9,25 @@ class JSONResponse {
   static success(req: Request, res: Response, message: string, data?: object) {
     req.body.password && delete req.body.password
 
+    const headers = {
+      userAgent: req.headers['user-agent'],
+      platform: req.headers['sec-ch-ua'],
+      mobile: req.headers['sec-ch-ua-mobile'],
+      operatingSystem: req.headers['sec-ch-ua-platform'],
+      browser: req.headers['sec-ch-ua']
+    }
+
     if (data) {
       if (Object.prototype.hasOwnProperty.call(data, 'users')) {
         const users = (data as Sensitive)['users']
         users.forEach((item: Sensitive) => {
-          if (Object.prototype.hasOwnProperty.call(data, 'password')) {
-            if ((item as Sensitive)['password']) {
-              delete (item as Sensitive)['password']
+          if (item['password']) {
+            if (item['password']) {
+              delete item['password']
+            }
+
+            if (item['email']) {
+              item['email'] = maskEmail(item['email'])
             }
           }
         })
@@ -23,20 +36,22 @@ class JSONResponse {
           if ((data as Sensitive)['password']) {
             delete (data as Sensitive)['password']
           }
+          if ((data as Sensitive)['email']) {
+            delete (data as Sensitive)['email']
+          }
         }
       }
     }
 
-    this.logger.info(
-      JSON.stringify({
-        ip: req.ip,
-        method: req.method,
-        url: req.url,
-        query: req.query,
-        body: req.body,
-        data: data
-      })
-    )
+    this.logger.info({
+      headers,
+      ip: req.ip,
+      method: req.method,
+      url: req.url,
+      query: req.query,
+      body: req.body,
+      data: data
+    })
 
     res.status(200).json({
       code: 200,
@@ -47,8 +62,17 @@ class JSONResponse {
 
   static create(req: Request, res: Response, message: string, data: object) {
     req.body.password && delete req.body.password
+
+    const headers = {
+      userAgent: req.headers['user-agent'],
+      platform: req.headers['sec-ch-ua'],
+      mobile: req.headers['sec-ch-ua-mobile'],
+      operatingSystem: req.headers['sec-ch-ua-platform'],
+      browser: req.headers['sec-ch-ua']
+    }
     this.logger.info(
       JSON.stringify({
+        headers,
         ip: req.ip,
         method: req.method,
         url: req.url,
@@ -74,8 +98,17 @@ class JSONResponse {
       delete req.body.password
     }
 
+    const headers = {
+      userAgent: req.headers['user-agent'],
+      platform: req.headers['sec-ch-ua'],
+      mobile: req.headers['sec-ch-ua-mobile'],
+      operatingSystem: req.headers['sec-ch-ua-platform'],
+      browser: req.headers['sec-ch-ua']
+    }
+
     this.logger.info(
       JSON.stringify({
+        headers,
         ip: req.ip,
         method: req.method,
         url: req.url,
@@ -93,8 +126,17 @@ class JSONResponse {
   }
 
   static notFound(req: Request, res: Response, message: string) {
+    const headers = {
+      userAgent: req.headers['user-agent'],
+      platform: req.headers['sec-ch-ua'],
+      mobile: req.headers['sec-ch-ua-mobile'],
+      operatingSystem: req.headers['sec-ch-ua-platform'],
+      browser: req.headers['sec-ch-ua']
+    }
+
     this.logger.error(
       JSON.stringify({
+        headers,
         ip: req.ip,
         method: req.method,
         url: req.url,
@@ -109,8 +151,16 @@ class JSONResponse {
   }
 
   static unauthorized(req: Request, res: Response, message: string) {
+    const headers = {
+      userAgent: req.headers['user-agent'],
+      platform: req.headers['sec-ch-ua'],
+      mobile: req.headers['sec-ch-ua-mobile'],
+      operatingSystem: req.headers['sec-ch-ua-platform'],
+      browser: req.headers['sec-ch-ua']
+    }
     this.logger.error(
       JSON.stringify({
+        headers,
         ip: req.ip,
         method: req.method,
         url: req.url,
@@ -125,7 +175,15 @@ class JSONResponse {
   }
 
   static forbidden(req: Request, res: Response, message: string) {
+    const headers = {
+      userAgent: req.headers['user-agent'],
+      platform: req.headers['sec-ch-ua'],
+      mobile: req.headers['sec-ch-ua-mobile'],
+      operatingSystem: req.headers['sec-ch-ua-platform'],
+      browser: req.headers['sec-ch-ua']
+    }
     this.logger.info(req.url, {
+      headers,
       ip: req.ip,
       method: req.method,
       url: req.url,
@@ -143,7 +201,15 @@ class JSONResponse {
     message?: string,
     data?: object
   ) {
+    const headers = {
+      userAgent: req.headers['user-agent'],
+      platform: req.headers['sec-ch-ua'],
+      mobile: req.headers['sec-ch-ua-mobile'],
+      operatingSystem: req.headers['sec-ch-ua-platform'],
+      browser: req.headers['sec-ch-ua']
+    }
     this.logger.info(req.url, {
+      headers,
       ip: req.ip,
       method: req.method,
       url: req.url,
